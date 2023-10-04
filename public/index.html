@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Шифровальня</title>
+    <link type="text/css" rel="stylesheet" href="styles.css" >
+</head>
+<body>
+<div class="container">
+    <h1 class="title">AES - шифрование</h1>
+    <form method="post" id="crypto-form">
+        <label for="input-text">Введите текст для шифрования / расшифрования:</label>
+        <textarea id="input-text" name="input-text" placeholder="Введите текст..."></textarea>
+        <label for="input-key">Введите ключ:</label>
+        <textarea id="input-key" name="input-key" placeholder="Введите ключ..."></textarea>
+        <label for="output-text">Расшированный / зашифрованный текст:</label>
+        <textarea id="output-text" name="output-text" readonly></textarea>
+        <div>
+            <label for="encryption">Зашифровать:</label>
+            <input type="checkbox" id="encryption" name="encryption" value="encryption" onclick="toggleDecryption()">
+            <label for="decryption">Расшифровать:</label>
+            <input type="checkbox" id="decryption" name="decryption" value="decryption" onclick="toggleEncryption()">
+        </div>
+        <p></p>
+        <button type="submit">Выполнить</button>
+    </form>
+
+</div>
+<script>
+    function toggleDecryption() {
+        const encryptionCheckbox = document.getElementById("encryption");
+        const decryptionCheckbox = document.getElementById("decryption");
+
+        if (encryptionCheckbox.checked) {
+            decryptionCheckbox.checked = false;
+        }
+    }
+
+    function toggleEncryption() {
+        const encryptionCheckbox = document.getElementById("encryption");
+        const decryptionCheckbox = document.getElementById("decryption");
+
+        if (decryptionCheckbox.checked) {
+            encryptionCheckbox.checked = false;
+        }
+    }
+    // Получаем ссылки на элементы формы
+    const cryptoForm = document.getElementById("crypto-form");
+    const inputText = document.getElementById("input-text");
+    const inputKey = document.getElementById("input-key");
+    const outputText = document.getElementById("output-text");
+
+
+    // Добавляем обработчик события submit формы
+    cryptoForm.addEventListener("submit", (event) => {
+        event.preventDefault(); // Отменяем отправку формы по умолчанию
+        const encryptionCheckbox = document.getElementById("encryption").checked;
+        const decryptionCheckbox = document.getElementById("decryption").checked;
+        // Создаем объект data, который содержит значения, введенные пользователем в текстовое поле и ключ шифрования
+        const data = {
+            'input-text': inputText.value,
+            'input-key': inputKey.value,
+            'encrypt': encryptionCheckbox,
+            'decrypt': decryptionCheckbox,
+        };
+
+        // Отправляем POST-запрос на сервер с заголовком Content-Type: application/json
+        fetch('/', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json()) // Получаем ответ в формате JSON
+            .then(data => {
+                outputText.value = data['output-text']; // Выводим расшифрованный текст в текстовое поле вывода
+                console.log(data['output-text']) // Логируем расшифрованный текст в консоль
+            })
+            .catch(error => console.error(error)); // Обрабатываем ошибки в консоли
+    });
+</script>
+</body>
+</html>
